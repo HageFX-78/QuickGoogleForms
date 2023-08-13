@@ -12,41 +12,49 @@
 // ==/UserScript==
 
 GM_addStyle(`
-
-#qgf-mainTab{
+#qgf-tabContainer{
     style : block;
-    right:0;
-    height : 50%;
-    width: 20%;
+    height : 70%;
+    width: 24%;
     position: fixed;
     z-index: 1;
+    top: 50%;
+    transform: translateY(-50%);
+    border-style: none;
+    transition: right 0.3s ease;
+}
+#qgf-mainTab{
     top: 0;
     background-color: #2A3439; /* Black */
     overflow-x: hidden; /* Disable horizontal scroll */
     box-shadow: 0.1px 0.1px 2px #393E46;
     border-style: none;
-    border-radius: 10px 0px 0px 10px;
+    border-radius: 0px 0px 0px 10px;
     align-items: center;
-    padding: 36px 36px 26px 26px;
-    margin: 10% 0;
+    padding: 26px 36px 26px 26px;
     font-size: 14px;
     color: #EEEEEE;
-    overflow: hidden;
+    
+}
+.qgf-hiddenTab{
+    right: -24.1%;
+}
+.qgf-visibleTab{
+    right: 0;
 }
 #qgf-tabToggle{
     position: absolute;
-    left: 0px;
+    left: -14%;
+    width: 10%;
     top: 0;
-    height:100%;
+    height:10%;
     cursor: pointer;
     color: #EEEEEE;
     background-color: #2A3439; /* Black */
-    display: flex; /* Enable Flexbox */
-    align-items: center;
-    justify-content: center; /* Center horizontally */
     padding: 8px;
     font-size: 36px;
     text-align: center;
+    border-radius: 10px 0px 0px 10px;
 }
 #qgf-tabToggle:hover{
     background-color: #3b484f;
@@ -117,8 +125,12 @@ GM_addStyle(`
 window.addEventListener('load', function () {
     'use strict';
 
+    var tabIsVisible = true;
     var LinearMap = [];
     var RadioMap = [];
+    var RadioGridMap = [];
+    var NormCheckboxMap = [];
+    var CheckboxGridMap = [];
     // - - - - - -General Functions
     function GetRndInteger(min, max) {
         //Inclusive min, Inclusive max, swap values if min is bigger than max
@@ -130,14 +142,36 @@ window.addEventListener('load', function () {
         }
     }
 
+    function ToggleTab(tabContainer, tabTog)
+    {
+        if(tabIsVisible)
+        {
+            tabContainer.className = "qgf-hiddenTab";
+            tabTog.innerHTML = "&#8249;";
+        }   
+        else
+        {
+            tabContainer.className = "qgf-visibleTab";
+            tabTog.innerHTML = "&#8250;";
+        }
+            
+
+        tabIsVisible = !tabIsVisible;
+    }
+
     function CreateUI() {
+        let invTabContainer = document.createElement('div');
+        invTabContainer.id = "qgf-tabContainer";
+        invTabContainer.className = "qgf-visibleTab";
+
         let mainTab = document.createElement('div');
         mainTab.id = "qgf-mainTab";
 
         let tabToggle = document.createElement('span');
         tabToggle.id = "qgf-tabToggle";
-        tabToggle.innerHTML = "&#8249;";
-        
+        tabToggle.innerHTML = "&#8250;";
+        tabToggle.onclick = () => {  ToggleTab(invTabContainer, tabToggle);};
+
         // > > > > > > > > > Radio linear likert section > > > > > > > > > > > > > > >
         let qgfSection1 = document.createElement('div');
         qgfSection1.className = "qgf-section";
@@ -186,17 +220,38 @@ window.addEventListener('load', function () {
         let radioSelectRandomizeBtn = document.createElement('div');
         radioSelectRandomizeBtn.className = "qgf-finalSelBtn";
         radioSelectRandomizeBtn.innerHTML = " Randomize ";
-        radioSelectRandomizeBtn.onclick = () => {NormalRadioSelect()};
+        radioSelectRandomizeBtn.onclick = () => { NormalRadioSelect() };
+        // < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < <
+
+        // > > > > > > > > > Radio normal section > > > > > > > > > > > > > > >
+        let qgfSection3 = document.createElement('div');
+        qgfSection3.className = "qgf-section";
+
+        let secTitle3 = document.createElement('div');
+        secTitle3.className = "qgf-sectionTitles";
+        secTitle3.innerHTML = "Normal Checkbox select Randomize";
+
+        let normalCheckboxRandomizeBtn = document.createElement('div');
+        normalCheckboxRandomizeBtn.className = "qgf-finalSelBtn";
+        normalCheckboxRandomizeBtn.innerHTML = " Randomize ";
+        normalCheckboxRandomizeBtn.onclick = () => { NormalCheckboxSelect() };
         // < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < <
         //HTML injecton
-        document.body.appendChild(mainTab);
+        //document.body.appendChild(mainTab);
+        document.body.appendChild(invTabContainer);
 
-        mainTab.appendChild(tabToggle);
+        invTabContainer.appendChild(tabToggle);
+        invTabContainer.appendChild(mainTab);
+        
+
         mainTab.appendChild(secTitle1);
         mainTab.appendChild(qgfSection1);
         mainTab.appendChild(secTitle2);
         mainTab.appendChild(qgfSection2);
+        mainTab.appendChild(secTitle3);
+        mainTab.appendChild(qgfSection3);
 
+        //Section 1
         qgfSection1.appendChild(rangeText);
         qgfSection1.appendChild(selectionDropDownStart);
         AddOptions(selectionDropDownStart, 0, 10);
@@ -207,8 +262,11 @@ window.addEventListener('load', function () {
         qgfSection1.appendChild(resetDropDown);
         qgfSection1.appendChild(linearSelectRadioBtn);
 
-
+        //Section 2
         qgfSection2.appendChild(radioSelectRandomizeBtn);
+
+        //Section 3
+        qgfSection3.appendChild(normalCheckboxRandomizeBtn);
 
     }
     function AddOptions(selectionParent, addStart, addCount) {
@@ -229,11 +287,11 @@ window.addEventListener('load', function () {
     // - - - - - - -  Find Categorize Elements
     function CategorizeElements() {
         let AllRadioGroup = document.querySelectorAll('div[role="radiogroup"]:not([aria-label]) > span');
+        let CheckerGroup = document.querySelectorAll('div[role="list"][aria-labelledby]');
+        let CheckGridGroupRaw = document.querySelectorAll('div[role="group"]');
 
         //Identify radio group type, linear likert scale and normal radio selection
         for (let x = 0; x < AllRadioGroup.length; x++) {
-
-            console.log("Found " + AllRadioGroup[x].children.length);
             if (AllRadioGroup[x].children.length == 2) {
                 let temp = AllRadioGroup[x].querySelectorAll('div[role="radio"][aria-label]');
                 LinearMap.push(temp);
@@ -242,7 +300,33 @@ window.addEventListener('load', function () {
                 let temp = AllRadioGroup[x].querySelectorAll('div[role="radio"][aria-label]');
                 RadioMap.push(temp);
             }
+        }
 
+        //Normal checkbox
+        for (let x = 0; x < CheckerGroup.length; x++) {
+            let temp = CheckerGroup[x].querySelectorAll('div[role="checkbox"]');
+            if (temp.length > 0) {
+                NormCheckboxMap.push(temp);
+            }
+        }
+
+        //Checkbox grid, group from the grid rows instead of parent as it has no distinguising data-value
+        let CheckRawTemp = [];
+        let CacheLabel = CheckGridGroupRaw[0].getAttribute("aria-describedby");
+        for (let x = 0; x < CheckGridGroupRaw.length; x++) {
+
+            if (CheckGridGroupRaw[x].getAttribute("aria-describedby") == CacheLabel) {
+                CheckRawTemp.push(CheckGridGroupRaw[x]);
+            } else {
+                CheckboxGridMap.push(CheckRawTemp);
+                CheckRawTemp = [];
+                CacheLabel = CheckGridGroupRaw[x].getAttribute("aria-describedby");
+                CheckRawTemp.push(CheckGridGroupRaw[x]);
+            }
+
+            if (x === CheckGridGroupRaw.length - 1) {
+                CheckboxGridMap.push(CheckRawTemp);
+            }
         }
     }
     // - - - - - - - Core Functions
@@ -260,12 +344,10 @@ window.addEventListener('load', function () {
                 else {
                     finalSelection = GetRndInteger(0, LinearMap[y].length - 1);
                 }
-
             }
             else {
                 finalSelection = selSingle - 1;//Offset similar to selected -1
             }
-
             // Special case where likert scale has 0, so remove offset of -1
             if (LinearMap[y][0].getAttribute('data-value') == "0") {
                 finalSelection++;
@@ -278,7 +360,6 @@ window.addEventListener('load', function () {
                     }
                     hasSelected = true;
                 }
-
             }
 
             //Defaults to final item in the question
@@ -289,7 +370,6 @@ window.addEventListener('load', function () {
     }
 
     function NormalRadioSelect() {
-
         for (let y = 0; y < RadioMap.length; y++) {
 
             let hasSelected = false;
@@ -302,7 +382,19 @@ window.addEventListener('load', function () {
                     }
                     hasSelected = true;
                 }
+            }
+        }
+    }
 
+    function NormalCheckboxSelect()
+    {
+        for (let x = 0; x < NormCheckboxMap.length; x++) {
+            for(let y = 0; y < NormCheckboxMap[x].length; y++)
+            {
+                if(GetRndInteger(0, 1) == 0)
+                {
+                    NormCheckboxMap[x][y].click();
+                }         
             }
         }
     }
