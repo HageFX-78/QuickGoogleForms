@@ -1,12 +1,13 @@
 // ==UserScript==
 // @name         QuickGoogleForms
 // @namespace    https://github.com/HageFX-78
-// @version      0.1.2
+// @version      0.2.1
 // @description  Google forms quick selector and filler
 // @author       HageFX78
-// @match        https://docs.google.com/forms/d/e/*/viewform
+// @match        https://docs.google.com/forms/d/e/*/viewform*
 // @match        https://docs.google.com/forms/d/e/*/formResponse
 // @match        https://docs.google.com/forms/u/0/d/e/*/formResponse
+// @match        https://forms.gle/*
 // @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
 // @require      file:///C:\Users\user\Desktop\CodeStuff\Userscript\QuickGoogleForms\QuickGoogleForms.user.js
 // @grant        GM_addStyle
@@ -133,6 +134,16 @@ window.addEventListener('load', function () {
     var RadioGridMap = [];
     var NormCheckboxMap = [];
     var CheckboxGridMap = [];
+    var ShortTextMap = [];
+    var LongTextMap = [];
+
+    var ShortTextMap = [];
+    var LongTextMap = [];
+
+    // Special Global References
+    var selectionDropDownStart;
+    var selectionDropDownEnd;
+
     // - - - - - -General Functions
     function GetRndInteger(min, max) {
         //Inclusive min, Inclusive max, swap values if min is bigger than max
@@ -144,19 +155,16 @@ window.addEventListener('load', function () {
         }
     }
 
-    function ToggleTab(tabContainer, tabTog)
-    {
-        if(tabIsVisible)
-        {
+    function ToggleTab(tabContainer, tabTog) {
+        if (tabIsVisible) {
             tabContainer.className = "qgf-hiddenTab";
             tabTog.innerHTML = "&#8249;";
-        }   
-        else
-        {
+        }
+        else {
             tabContainer.className = "qgf-visibleTab";
             tabTog.innerHTML = "&#8250;";
         }
-            
+
 
         tabIsVisible = !tabIsVisible;
     }
@@ -172,7 +180,21 @@ window.addEventListener('load', function () {
         let tabToggle = document.createElement('span');
         tabToggle.id = "qgf-tabToggle";
         tabToggle.innerHTML = "&#8250;";
-        tabToggle.onclick = () => {  ToggleTab(invTabContainer, tabToggle);};
+        tabToggle.onclick = () => { ToggleTab(invTabContainer, tabToggle); };
+
+
+        // > > > > > > > > > Default ALL > > > > > > > > > > > > > > >
+        let qgfSection0 = document.createElement('div');
+        qgfSection0.className = "qgf-section";
+
+        let secTitle0 = document.createElement('div');
+        secTitle0.className = "qgf-sectionTitles";
+        secTitle0.innerHTML = "Fill with Default Settings";
+
+        let defaultBtn = document.createElement('div');
+        defaultBtn.className = "qgf-finalSelBtn";
+        defaultBtn.innerHTML = " Fill ";
+        defaultBtn.onclick = () => { DefaultAll(); }
 
         // > > > > > > > > > Radio linear likert section > > > > > > > > > > > > > > >
         let qgfSection1 = document.createElement('div');
@@ -185,13 +207,13 @@ window.addEventListener('load', function () {
         let rangeText = document.createElement('span');
         rangeText.innerHTML = "Range : &nbsp"
 
-        let selectionDropDownStart = document.createElement('select');
+        selectionDropDownStart = document.createElement('select');
         selectionDropDownStart.className = "qgf-selectionDropDown";
 
         let spacing = document.createElement('span');
         spacing.innerHTML = "&nbsp - &nbsp";
 
-        let selectionDropDownEnd = document.createElement('select');
+        selectionDropDownEnd = document.createElement('select');
         selectionDropDownEnd.className = "qgf-selectionDropDown";
 
         let resetDropDown = document.createElement('span');
@@ -244,8 +266,9 @@ window.addEventListener('load', function () {
 
         invTabContainer.appendChild(tabToggle);
         invTabContainer.appendChild(mainTab);
-        
 
+        mainTab.appendChild(secTitle0);
+        mainTab.appendChild(qgfSection0);
         mainTab.appendChild(secTitle1);
         mainTab.appendChild(qgfSection1);
         mainTab.appendChild(secTitle2);
@@ -253,13 +276,16 @@ window.addEventListener('load', function () {
         mainTab.appendChild(secTitle3);
         mainTab.appendChild(qgfSection3);
 
+        //Section 0
+        qgfSection0.appendChild(defaultBtn);
+
         //Section 1
         qgfSection1.appendChild(rangeText);
         qgfSection1.appendChild(selectionDropDownStart);
-        AddOptions(selectionDropDownStart, 0, 10);
+        AddOptions(selectionDropDownStart, 0, 10, 1);
         qgfSection1.appendChild(spacing);
         qgfSection1.appendChild(selectionDropDownEnd);
-        AddOptions(selectionDropDownEnd, 0, 10);
+        AddOptions(selectionDropDownEnd, 0, 10, 5);
         qgfSection1.appendChild(selectionDropDownEnd);
         qgfSection1.appendChild(resetDropDown);
         qgfSection1.appendChild(linearSelectRadioBtn);
@@ -271,7 +297,7 @@ window.addEventListener('load', function () {
         qgfSection3.appendChild(normalCheckboxRandomizeBtn);
 
     }
-    function AddOptions(selectionParent, addStart, addCount) {
+    function AddOptions(selectionParent, addStart, addCount, defaultIndex = -1) {
         let noneVal = document.createElement('option');
         noneVal.value = -1;
         noneVal.textContent = "None";
@@ -282,15 +308,24 @@ window.addEventListener('load', function () {
             let tempOpt = document.createElement('option');
             tempOpt.value = x;
             tempOpt.textContent = x;
+
             selectionParent.appendChild(tempOpt);
+
+            if (defaultIndex != -1 && x == defaultIndex) {
+                tempOpt.selected = true;
+            }
         }
 
     }
     // - - - - - - -  Find Categorize Elements
     function CategorizeElements() {
         let AllRadioGroup = document.querySelectorAll('div[role="radiogroup"]:not([aria-label]) > span');
+        let RadioGridGroupRaw = document.querySelectorAll('div[role="radiogroup"][aria-label]');
         let CheckerGroup = document.querySelectorAll('div[role="list"][aria-labelledby]');
         let CheckGridGroupRaw = document.querySelectorAll('div[role="group"]');
+
+        let ShortTextGroup = document.querySelectorAll('input[type="text"]');
+        let LongTextGroup = document.querySelectorAll('textarea');
 
         //Identify radio group type, linear likert scale and normal radio selection
         for (let x = 0; x < AllRadioGroup.length; x++) {
@@ -304,6 +339,27 @@ window.addEventListener('load', function () {
             }
         }
 
+        //Radio grid
+        let RadioRawTemp = [];
+        let CacheLabelRadio = RadioGridGroupRaw[0].getAttribute("aria-describedby");
+        for (let x = 0; x < RadioGridGroupRaw.length; x++) {
+
+            if (RadioGridGroupRaw[x].getAttribute("aria-describedby") == CacheLabelRadio) {
+                RadioRawTemp.push(RadioGridGroupRaw[x]);
+            } else {
+                RadioGridMap.push(RadioRawTemp);
+                RadioRawTemp = [];
+                CacheLabelRadio = RadioGridGroupRaw[x].getAttribute("aria-describedby");
+                RadioRawTemp.push(RadioGridGroupRaw[x]);
+            }
+
+            if (x === RadioGridGroupRaw.length - 1) {
+                RadioGridMap.push(RadioRawTemp);
+            }
+        }
+        //alert(RadioGridMap[0].length);
+
+
         //Normal checkbox
         for (let x = 0; x < CheckerGroup.length; x++) {
             let temp = CheckerGroup[x].querySelectorAll('div[role="checkbox"]');
@@ -314,15 +370,15 @@ window.addEventListener('load', function () {
 
         //Checkbox grid, group from the grid rows instead of parent as it has no distinguising data-value
         let CheckRawTemp = [];
-        let CacheLabel = CheckGridGroupRaw[0].getAttribute("aria-describedby");
+        let CacheLabelCheckbox = CheckGridGroupRaw[0].getAttribute("aria-describedby");
         for (let x = 0; x < CheckGridGroupRaw.length; x++) {
 
-            if (CheckGridGroupRaw[x].getAttribute("aria-describedby") == CacheLabel) {
+            if (CheckGridGroupRaw[x].getAttribute("aria-describedby") == CacheLabelCheckbox) {
                 CheckRawTemp.push(CheckGridGroupRaw[x]);
             } else {
                 CheckboxGridMap.push(CheckRawTemp);
                 CheckRawTemp = [];
-                CacheLabel = CheckGridGroupRaw[x].getAttribute("aria-describedby");
+                CacheLabelCheckbox = CheckGridGroupRaw[x].getAttribute("aria-describedby");
                 CheckRawTemp.push(CheckGridGroupRaw[x]);
             }
 
@@ -330,6 +386,10 @@ window.addEventListener('load', function () {
                 CheckboxGridMap.push(CheckRawTemp);
             }
         }
+
+        //Short text reference
+        ShortTextMap = ShortTextGroup;
+        LongTextMap = LongTextGroup;
     }
     // - - - - - - - Core Functions
     function LinearScaleRadioSelect(selSingle = 3, selRangeStart = -1, selRangeEnd = -1, randomizeBool = false) {
@@ -388,23 +448,37 @@ window.addEventListener('load', function () {
         }
     }
 
-    function NormalCheckboxSelect()
-    {
-        for (let x = 0; x < NormCheckboxMap.length; x++) {
-            for(let y = 0; y < NormCheckboxMap[x].length; y++)
-            {
-                if(GetRndInteger(0, 1) == 0)
-                {
+    function NormalCheckboxSelect() {
+        for (let x = 0; x < NormCheckboxMap.length; x++) {// Collection of questions
+
+            let hasCheckedOnce = false;
+
+            for (let y = 0; y < NormCheckboxMap[x].length; y++) { //Selections of each questions
+                if (GetRndInteger(0, 1) == 0) {
                     NormCheckboxMap[x][y].click();
-                }         
+                }
+
+                if (NormCheckboxMap[x][y].getAttribute("aria-checked") == "true") {
+                    hasCheckedOnce = true;
+                }
             }
+
+            if (!hasCheckedOnce) {// If no selection is checked default to 1 random selection
+                NormCheckboxMap[x][GetRndInteger(0, NormCheckboxMap[x].length - 1)].click();
+            }
+
         }
+    }
+
+    function DefaultAll() {
+        LinearScaleRadioSelect(-1, parseInt(selectionDropDownStart.value), parseInt(selectionDropDownEnd.value), true);
+        NormalRadioSelect();
+        NormalCheckboxSelect();
     }
 
     CreateUI();
     CategorizeElements();
     //LinearScaleRadioSelect(...[, , , true]);
-
 
 });
 //alert('Ran script');
