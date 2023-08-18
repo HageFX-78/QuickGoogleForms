@@ -5,6 +5,8 @@
 // @description  Google forms quick selector and filler
 // @author       HageFX78
 // @match        https://docs.google.com/forms/d/e/*/viewform
+// @match        https://docs.google.com/forms/d/e/*/formResponse
+// @match        https://docs.google.com/forms/u/0/d/e/*/formResponse
 // @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
 // @require      file:///C:\Users\user\Desktop\CodeStuff\Userscript\QuickGoogleForms\QuickGoogleForms.user.js
 // @grant        GM_addStyle
@@ -405,3 +407,4 @@ window.addEventListener('load', function () {
 
 
 });
+//alert('Ran script');
