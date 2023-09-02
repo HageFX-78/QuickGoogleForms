@@ -25,6 +25,11 @@ Uncertain:
 3. Open any google form and the tool will appear on the right.
 4. Enjoy!
 
+## Optional
+You can test the script in this form if needed.
+[Test Google Form](https://forms.gle/5qp21nC7AMjKtUfEA)
+
+
 ### Known Issues
 - ~~Script won't load of first load, refresh the page and the tool will appear.~~
 
