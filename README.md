@@ -6,6 +6,7 @@ Works on the following question types:
 - [x] Multiple Choice (Radio Buttons)
 - [x] Linear Scale
 - [x] Checkboxes
+
 To be added:
 - [ ] Multiple Choice Grid (Radio Buttons)
 - [ ] Checkbox Grid 
@@ -14,6 +15,7 @@ To be added:
 - [ ] Dropdown
 - [ ] Date 
 - [ ] Time
+
 Uncertain:
 - [ ] File Upload
 
