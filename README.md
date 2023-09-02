@@ -26,9 +26,13 @@ Uncertain:
 4. Enjoy!
 
 ## Optional
-You can test the script in this form if needed.
+You can test the script in this form if needed -> 
 [Test Google Form](https://forms.gle/5qp21nC7AMjKtUfEA)
 
+## How to use
+Just clicking the first button "Fill" on the tool will fill everything with default settings. 
+
+You also can currently set the range in which how you want to randomize Linear Scale question selections. 1 to 5 by default. Setting same numbers for min max will select that number only for the entire form. Values that go over the number of selection will be clamped to the max value, Ex: 6 to 7 will all return 5 being selected.
 
 ### Known Issues
 - ~~Script won't load of first load, refresh the page and the tool will appear.~~
