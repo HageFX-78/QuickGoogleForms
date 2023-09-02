@@ -9,9 +9,10 @@
 // @match        https://docs.google.com/forms/u/0/d/e/*/formResponse
 // @match        https://forms.gle/*
 // @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
-// @require      file:///C:\Users\user\Desktop\CodeStuff\Userscript\QuickGoogleForms\QuickGoogleForms.user.js
 // @grant        GM_addStyle
 // @run-at       document-start
+// @downloadURL  https://github.com/HageFX-78/QuickGoogleForms/raw/main/QuickGoogleForms.user.js
+// @updateURL    https://github.com/HageFX-78/QuickGoogleForms/raw/main/QuickGoogleForms.user.js
 // ==/UserScript==
 
 GM_addStyle(`
@@ -137,9 +138,6 @@ window.addEventListener('load', function () {
     var ShortTextMap = [];
     var LongTextMap = [];
 
-    var ShortTextMap = [];
-    var LongTextMap = [];
-
     // Special Global References
     var selectionDropDownStart;
     var selectionDropDownEnd;
@@ -164,8 +162,6 @@ window.addEventListener('load', function () {
             tabContainer.className = "qgf-visibleTab";
             tabTog.innerHTML = "&#8250;";
         }
-
-
         tabIsVisible = !tabIsVisible;
     }
 
@@ -219,6 +215,7 @@ window.addEventListener('load', function () {
         let resetDropDown = document.createElement('span');
         resetDropDown.className = "qgf-resetDropDown";
         resetDropDown.innerHTML = "&#8634";
+        resetDropDown.onclick = () => { ResetLinearOptions(selectionDropDownStart, selectionDropDownEnd, 1, 5); };
 
         let linearSelectRadioBtn = document.createElement('div');
         linearSelectRadioBtn.className = "qgf-finalSelBtn";
@@ -239,11 +236,11 @@ window.addEventListener('load', function () {
 
         let secTitle2 = document.createElement('div');
         secTitle2.className = "qgf-sectionTitles";
-        secTitle2.innerHTML = "Radio select Randomize";
+        secTitle2.innerHTML = "Radio Select";
 
         let radioSelectRandomizeBtn = document.createElement('div');
         radioSelectRandomizeBtn.className = "qgf-finalSelBtn";
-        radioSelectRandomizeBtn.innerHTML = " Randomize ";
+        radioSelectRandomizeBtn.innerHTML = "Randomize";
         radioSelectRandomizeBtn.onclick = () => { NormalRadioSelect() };
         // < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < <
 
@@ -253,11 +250,11 @@ window.addEventListener('load', function () {
 
         let secTitle3 = document.createElement('div');
         secTitle3.className = "qgf-sectionTitles";
-        secTitle3.innerHTML = "Normal Checkbox select Randomize";
+        secTitle3.innerHTML = "Checkbox";
 
         let normalCheckboxRandomizeBtn = document.createElement('div');
         normalCheckboxRandomizeBtn.className = "qgf-finalSelBtn";
-        normalCheckboxRandomizeBtn.innerHTML = " Randomize ";
+        normalCheckboxRandomizeBtn.innerHTML = "Randomize";
         normalCheckboxRandomizeBtn.onclick = () => { NormalCheckboxSelect() };
         // < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < < <
         //HTML injecton
@@ -317,6 +314,12 @@ window.addEventListener('load', function () {
         }
 
     }
+    function ResetLinearOptions(minDrop, maxDrop, defMin = 1, defMax = 5) {
+        const optionToSelect = minDrop.querySelector(`option[value="${defMin}"]`);
+        optionToSelect.selected = true;
+        const optionToSelect2 = maxDrop.querySelector(`option[value="${defMax}"]`);
+        optionToSelect2.selected = true;
+    }
     // - - - - - - -  Find Categorize Elements
     function CategorizeElements() {
         let AllRadioGroup = document.querySelectorAll('div[role="radiogroup"]:not([aria-label]) > span');
@@ -324,7 +327,7 @@ window.addEventListener('load', function () {
         let CheckerGroup = document.querySelectorAll('div[role="list"][aria-labelledby]');
         let CheckGridGroupRaw = document.querySelectorAll('div[role="group"]');
 
-        let ShortTextGroup = document.querySelectorAll('input[type="text"]');
+        let ShortTextGroup = document.querySelectorAll('input[type="text"]:not([role])');
         let LongTextGroup = document.querySelectorAll('textarea');
 
         //Identify radio group type, linear likert scale and normal radio selection
@@ -357,8 +360,6 @@ window.addEventListener('load', function () {
                 RadioGridMap.push(RadioRawTemp);
             }
         }
-        //alert(RadioGridMap[0].length);
-
 
         //Normal checkbox
         for (let x = 0; x < CheckerGroup.length; x++) {
@@ -390,6 +391,7 @@ window.addEventListener('load', function () {
         //Short text reference
         ShortTextMap = ShortTextGroup;
         LongTextMap = LongTextGroup;
+
     }
     // - - - - - - - Core Functions
     function LinearScaleRadioSelect(selSingle = 3, selRangeStart = -1, selRangeEnd = -1, randomizeBool = false) {

@@ -2,7 +2,20 @@
 A script that adds a side bar tool to hasten the process of filling up google forms
 
 ## Features
-- TBD
+Works on the following question types:
+- [x] Multiple Choice (Radio Buttons)
+- [x] Linear Scale
+- [x] Checkboxes
+To be added:
+- [ ] Multiple Choice Grid (Radio Buttons)
+- [ ] Checkbox Grid 
+- [ ] Short Answer
+- [ ] Paragraph
+- [ ] Dropdown
+- [ ] Date 
+- [ ] Time
+Uncertain:
+- [ ] File Upload
 
 ## NOTICE
 It is still in WIP phase, auto-update is not implemented and the script won't work on first installation, to make it work
