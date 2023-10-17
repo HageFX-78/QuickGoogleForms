@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         QuickGoogleForms
 // @namespace    https://github.com/HageFX-78
-// @version      0.2.1
+// @version      0.2.2
 // @description  Google forms quick selector and filler
 // @author       HageFX78
 // @match        https://docs.google.com/forms/d/e/*/viewform*
@@ -165,6 +165,10 @@ window.addEventListener('load', function () {
         tabIsVisible = !tabIsVisible;
     }
 
+    function QGFLog(strtext) {
+        console.log("QGF : " + strtext);
+    }
+
     function CreateUI() {
         let invTabContainer = document.createElement('div');
         invTabContainer.id = "qgf-tabContainer";
@@ -293,6 +297,9 @@ window.addEventListener('load', function () {
         //Section 3
         qgfSection3.appendChild(normalCheckboxRandomizeBtn);
 
+
+        QGFLog("UI Created");
+
     }
     function AddOptions(selectionParent, addStart, addCount, defaultIndex = -1) {
         let noneVal = document.createElement('option');
@@ -330,6 +337,7 @@ window.addEventListener('load', function () {
         let ShortTextGroup = document.querySelectorAll('input[type="text"]:not([role])');
         let LongTextGroup = document.querySelectorAll('textarea');
 
+        
         //Identify radio group type, linear likert scale and normal radio selection
         for (let x = 0; x < AllRadioGroup.length; x++) {
             if (AllRadioGroup[x].children.length == 2) {
@@ -342,25 +350,6 @@ window.addEventListener('load', function () {
             }
         }
 
-        //Radio grid
-        let RadioRawTemp = [];
-        let CacheLabelRadio = RadioGridGroupRaw[0].getAttribute("aria-describedby");
-        for (let x = 0; x < RadioGridGroupRaw.length; x++) {
-
-            if (RadioGridGroupRaw[x].getAttribute("aria-describedby") == CacheLabelRadio) {
-                RadioRawTemp.push(RadioGridGroupRaw[x]);
-            } else {
-                RadioGridMap.push(RadioRawTemp);
-                RadioRawTemp = [];
-                CacheLabelRadio = RadioGridGroupRaw[x].getAttribute("aria-describedby");
-                RadioRawTemp.push(RadioGridGroupRaw[x]);
-            }
-
-            if (x === RadioGridGroupRaw.length - 1) {
-                RadioGridMap.push(RadioRawTemp);
-            }
-        }
-
         //Normal checkbox
         for (let x = 0; x < CheckerGroup.length; x++) {
             let temp = CheckerGroup[x].querySelectorAll('div[role="checkbox"]');
@@ -368,30 +357,58 @@ window.addEventListener('load', function () {
                 NormCheckboxMap.push(temp);
             }
         }
-
-        //Checkbox grid, group from the grid rows instead of parent as it has no distinguising data-value
-        let CheckRawTemp = [];
-        let CacheLabelCheckbox = CheckGridGroupRaw[0].getAttribute("aria-describedby");
-        for (let x = 0; x < CheckGridGroupRaw.length; x++) {
-
-            if (CheckGridGroupRaw[x].getAttribute("aria-describedby") == CacheLabelCheckbox) {
-                CheckRawTemp.push(CheckGridGroupRaw[x]);
-            } else {
-                CheckboxGridMap.push(CheckRawTemp);
-                CheckRawTemp = [];
-                CacheLabelCheckbox = CheckGridGroupRaw[x].getAttribute("aria-describedby");
-                CheckRawTemp.push(CheckGridGroupRaw[x]);
-            }
-
-            if (x === CheckGridGroupRaw.length - 1) {
-                CheckboxGridMap.push(CheckRawTemp);
+        
+        //Radio grid
+        if(RadioGridGroupRaw.length > 0)
+        {
+            let RadioRawTemp = [];
+            let CacheLabelRadio = RadioGridGroupRaw[0].getAttribute("aria-describedby");
+            for (let x = 0; x < RadioGridGroupRaw.length; x++) {
+    
+                if (RadioGridGroupRaw[x].getAttribute("aria-describedby") == CacheLabelRadio) {
+                    RadioRawTemp.push(RadioGridGroupRaw[x]);
+                } else {
+                    RadioGridMap.push(RadioRawTemp);
+                    RadioRawTemp = [];
+                    CacheLabelRadio = RadioGridGroupRaw[x].getAttribute("aria-describedby");
+                    RadioRawTemp.push(RadioGridGroupRaw[x]);
+                }
+    
+                if (x === RadioGridGroupRaw.length - 1) {
+                    RadioGridMap.push(RadioRawTemp);
+                }
             }
         }
+        
+        
+        //Checkbox grid, group from the grid rows instead of parent as it has no distinguising data-value
+        if(CheckGridGroupRaw.length > 0)
+        {
+            let CheckRawTemp = [];
+            let CacheLabelCheckbox = CheckGridGroupRaw[0].getAttribute("aria-describedby");
+            for (let x = 0; x < CheckGridGroupRaw.length; x++) {
+
+                if (CheckGridGroupRaw[x].getAttribute("aria-describedby") == CacheLabelCheckbox) {
+                    CheckRawTemp.push(CheckGridGroupRaw[x]);
+                } else {
+                    CheckboxGridMap.push(CheckRawTemp);
+                    CheckRawTemp = [];
+                    CacheLabelCheckbox = CheckGridGroupRaw[x].getAttribute("aria-describedby");
+                    CheckRawTemp.push(CheckGridGroupRaw[x]);
+                }
+
+                if (x === CheckGridGroupRaw.length - 1) {
+                    CheckboxGridMap.push(CheckRawTemp);
+                }
+            }
+        }
+        
 
         //Short text reference
         ShortTextMap = ShortTextGroup;
         LongTextMap = LongTextGroup;
 
+        QGFLog("Elements Categorized");
     }
     // - - - - - - - Core Functions
     function LinearScaleRadioSelect(selSingle = 3, selRangeStart = -1, selRangeEnd = -1, randomizeBool = false) {
@@ -472,11 +489,15 @@ window.addEventListener('load', function () {
         }
     }
 
+
     function DefaultAll() {
         LinearScaleRadioSelect(-1, parseInt(selectionDropDownStart.value), parseInt(selectionDropDownEnd.value), true);
         NormalRadioSelect();
         NormalCheckboxSelect();
+        QGFLog("Filled with defaults");
     }
+
+    
 
     CreateUI();
     CategorizeElements();
