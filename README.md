@@ -1,4 +1,4 @@
-# Quick Google Forms v0.2.1
+# Quick Google Forms v0.2.2
 A script that adds a side bar tool to hasten the process of filling up google forms
 
 ## Features
