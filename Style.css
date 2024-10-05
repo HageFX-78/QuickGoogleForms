@@ -1,0 +1,210 @@
+:root {
+	/* Common Variables */
+	--color-bg-dark: #494949;
+	--color-bg-darker: #1f1f1f;
+	--color-bg-dark-hover: #2f2f2f;
+	--color-bg-medium: #515151;
+	--color-bg-medium-hover: #616161;
+	--color-bg-light: #84e2ff;
+	--color-addon-bg: #34cd4b;
+	--color-addon-hover: #2eaa3e;
+	--color-remove-addon: #ea4f24;
+	--color-text-light: #f1f1f1;
+	--color-text-medium: #d3d3d3;
+	--color-text-addon: #cecece;
+
+	--transition-speed: 0.2s;
+	--box-shadow-light: 0 0 5px 0 rgba(0, 0, 0, 0.2);
+}
+
+#qgf-mainTab {
+	background-color: var(--color-bg-dark);
+	right: 0;
+	top: 50%;
+	transform: translate(0, -50%);
+	position: fixed;
+	width: 25%;
+	height: fit-content;
+	max-height: 80%;
+
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: right;
+
+	transition: all ease-in-out var(--transition-speed);
+
+	display: grid;
+	grid-template-areas: "toggle content";
+	grid-template-columns: 10% 90%;
+}
+#qgf-tabContent {
+	grid-area: content;
+	width: 100%;
+	height: fit-content;
+	padding: 20px;
+	box-sizing: border-box;
+
+	transition: all ease-in-out var(--transition-speed);
+}
+#qgf-tabToggle {
+	grid-area: toggle;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	background-color: var(--color-bg-darker);
+	color: var(--color-text-medium);
+	cursor: pointer;
+	font-size: 60px;
+}
+#qgf-tabToggle:hover {
+	background-color: var(--color-bg-dark-hover);
+}
+
+.qgf-tabBtn {
+	background-color: var(--color-bg-medium);
+	color: var(--color-text-light);
+	font-size: 14px !important;
+	width: 100%;
+	height: 30px;
+	padding: 5px;
+	border: none;
+	font-size: 20px;
+	cursor: pointer;
+
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	box-shadow: var(--box-shadow-light);
+	box-sizing: border-box;
+
+	-webkit-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+.qgf-tabBtn:hover {
+	background-color: var(--color-bg-medium-hover);
+	cursor: pointer;
+}
+
+.qgf-fillAllSection {
+	display: flex;
+	width: 100%;
+	height: fit-content;
+	box-sizing: border-box;
+	border: 2px solid #3c3c3c;
+	border-radius: 2.5px;
+	justify-content: center;
+	align-items: center;
+}
+.qgf-sectionText {
+	color: var(--color-text-light);
+	font-size: 14px;
+	padding: 5px;
+	width: 100%;
+}
+
+/* Collapsible module */
+.collapse_arrow {
+	color: var(--color-text-light);
+	font-size: 16px;
+	position: absolute;
+	left: 10%;
+	transition: all 0.1s;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+.qgf-collapsibleSection {
+	color: var(--color-text-light);
+	width: 100%;
+	height: fit-content;
+	box-sizing: border-box;
+	border: 2px solid #3c3c3c;
+	transition: all ease-in-out var(--transition-speed);
+}
+.qgf-collapsibleToggle {
+	width: 100%;
+	height: 30px;
+	background-color: var(--color-bg-medium);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	position: relative;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+.qgf-collapsibleToggle:hover {
+	cursor: pointer;
+	background-color: var(--color-bg-medium-hover);
+}
+.qgf-collapsibleContent {
+	width: 100%;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+/* ------------------------------------------------------------------------------ Form in-question add on */
+.qgf-addonBtn {
+	position: absolute;
+	top: 15px;
+	right: 15px;
+	height: fit-content;
+	width: fit-content;
+	display: flex;
+	justify-content: right;
+	align-items: center;
+
+	transition: all ease-in-out var(--transition-speed);
+}
+.qgf-addonBtn:active {
+	transform: scale(0.9);
+}
+.qgf-addonBtnIcon {
+	background-color: var(--color-addon-bg);
+	color: var(--color-text-light);
+	font-size: 20px;
+	width: 30px;
+	height: 30px;
+	border: none;
+	cursor: pointer;
+
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	box-shadow: var(--box-shadow-light);
+
+	-webkit-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+.qgf-addonBtnIcon:hover {
+	background-color: var(--color-addon-hover);
+}
+
+.qgf-addonBtnText {
+	overflow: hidden;
+	display: none;
+	max-height: 15px;
+	background-color: #4b4b4b;
+	color: var(--color-text-addon);
+	font-size: 12px;
+	padding: 5px;
+
+	box-shadow: var(--box-shadow-light);
+}
+.qgf-blockAddon {
+	background-color: #6b6b6b;
+	color: var(--color-text-light);
+	width: 100%;
+	height: fit-content;
+	top: -5px;
+	margin: -20px 0 15px 0;
+	border-radius: 0 0 5px 5px;
+	padding: 20px 25px;
+	box-sizing: border-box;
+
+	transition: all ease-in-out var(--transition-speed);
+}
